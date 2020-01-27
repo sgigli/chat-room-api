@@ -79,12 +79,24 @@ app.use(userRoutes)
 // })
 io.on('connection', function (socket) {
   console.log('a user connected')
+  io.emit('chat message', 'hi')
 })
 
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html')
-  // res.sendFile().path.join(__dirname, '/index.html')
+io.on('connection', function (socket) {
+  socket.on('chat message', function (msg) {
+    console.log('message: ' + msg)
+  })
 })
+io.on('connection', function (socket) {
+  socket.on('chat message', function (msg) {
+    io.emit('chat message', msg)
+  })
+})
+
+// app.get('/', function (req, res) {
+//   res.sendFile(__dirname + '/index.html')
+//   // res.sendFile().path.join(__dirname, '/index.html')
+// })
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be
