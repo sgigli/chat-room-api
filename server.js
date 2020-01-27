@@ -6,6 +6,7 @@ const cors = require('cors')
 // require route files
 const exampleRoutes = require('./app/routes/example_routes')
 const userRoutes = require('./app/routes/user_routes')
+// const messageRoutes = require('./app/routes/message_routes')
 
 // require middleware
 const errorHandler = require('./lib/error_handler')
@@ -35,6 +36,14 @@ mongoose.connect(db, {
 // instantiate express application object
 const app = express()
 
+// var http = require('http').createServer(app)
+// var io = require('socket.io')(http)
+
+const socketio = require('socket.io')
+const http = require('http')
+const server = http.createServer(app)
+const io = socketio(server)
+
 // set CORS headers on response from this API using the `cors` NPM package
 // `CLIENT_ORIGIN` is an environment variable that will be set on Heroku
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
@@ -63,6 +72,19 @@ app.use(requestLogger)
 // register route files
 app.use(exampleRoutes)
 app.use(userRoutes)
+// app.use(messageRoutes)
+
+// app.get('/', function (req, res) {
+//   res.send('<h1>Hello world</h1>')
+// })
+io.on('connection', function (socket) {
+  console.log('a user connected')
+})
+
+app.get('/', function (req, res) {
+  res.sendFile(__dirname + '/index.html')
+  // res.sendFile().path.join(__dirname, '/index.html')
+})
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be
@@ -70,7 +92,8 @@ app.use(userRoutes)
 app.use(errorHandler)
 
 // run API on designated port (4741 in this case)
-app.listen(port, () => {
+// app -> server.listen
+server.listen(port, () => {
   console.log('listening on port ' + port)
 })
 
