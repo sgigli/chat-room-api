@@ -64,10 +64,10 @@ router.get('/examples/:id', requireToken, (req, res, next) => {
 
 // CREATE
 // POST /examples
-router.post('/messages', (req, res, next) => {
+router.post('/messages', requireToken, (req, res, next) => {
   // set owner of new example to be current user
-  // req.body.message.owner = req.user.id
-  console.log(req.body.message)
+  req.body.message.owner = req.user.id
+
   Message.create(req.body.message)
     // respond to succesful `create` with status 201 and JSON of new "example"
     .then(message => {
