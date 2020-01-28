@@ -52,15 +52,15 @@ router.get('/messages', (req, res, next) => {
 
 // SHOW
 // GET /examples/5a7db6c74d55bc51bdf39793
-router.get('/examples/:id', requireToken, (req, res, next) => {
-  // req.params.id will be set based on the `:id` in the route
-  Example.findById(req.params.id)
-    .then(handle404)
-    // if `findById` is succesful, respond with 200 and "example" JSON
-    .then(example => res.status(200).json({ example: example.toObject() }))
-    // if an error occurs, pass it to the handler
-    .catch(next)
-})
+// router.get('/examples/:id', requireToken, (req, res, next) => {
+//   // req.params.id will be set based on the `:id` in the route
+//   Example.findById(req.params.id)
+//     .then(handle404)
+//     // if `findById` is succesful, respond with 200 and "example" JSON
+//     .then(example => res.status(200).json({ example: example.toObject() }))
+//     // if an error occurs, pass it to the handler
+//     .catch(next)
+// })
 
 // CREATE
 // POST /examples
@@ -104,8 +104,8 @@ router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /examples/5a7db6c74d55bc51bdf39793
-router.delete('/examples/:id', requireToken, (req, res, next) => {
-  Example.findById(req.params.id)
+router.delete('/messages/:id', requireToken, (req, res, next) => {
+  Message.findById(req.params.id)
     .then(handle404)
     .then(example => {
       // throw an error if current user doesn't own `example`
