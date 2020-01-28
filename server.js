@@ -6,7 +6,7 @@ const cors = require('cors')
 // require route files
 const exampleRoutes = require('./app/routes/example_routes')
 const userRoutes = require('./app/routes/user_routes')
-// const messageRoutes = require('./app/routes/message_routes')
+const messageRoutes = require('./app/routes/message_routes')
 
 // require middleware
 const errorHandler = require('./lib/error_handler')
@@ -43,6 +43,7 @@ const socketio = require('socket.io')
 const http = require('http')
 const server = http.createServer(app)
 const io = socketio(server)
+// require('./app/routes/message_routes.js')(io)
 
 // set CORS headers on response from this API using the `cors` NPM package
 // `CLIENT_ORIGIN` is an environment variable that will be set on Heroku
@@ -72,21 +73,21 @@ app.use(requestLogger)
 // register route files
 app.use(exampleRoutes)
 app.use(userRoutes)
-// app.use(messageRoutes)
+app.use(messageRoutes)
 
 // app.get('/', function (req, res) {
 //   res.send('<h1>Hello world</h1>')
 // })
-io.on('connection', function (socket) {
-  console.log('a user connected')
-  io.emit('chat message', 'hi')
-})
-
-io.on('connection', function (socket) {
-  socket.on('chat message', function (msg) {
-    console.log('message: ' + msg)
-  })
-})
+// io.on('connection', function (socket) {
+//   console.log('a user connected')
+//   // io.emit('chat message', 'hi')
+// })
+//
+// io.on('connection', function (socket) {
+//   socket.on('chat message', function (msg) {
+//     console.log('message: ' + msg)
+//   })
+// })
 io.on('connection', function (socket) {
   socket.on('chat message', function (msg) {
     io.emit('chat message', msg)
@@ -97,6 +98,52 @@ io.on('connection', function (socket) {
 //   res.sendFile(__dirname + '/index.html')
 //   // res.sendFile().path.join(__dirname, '/index.html')
 // })
+
+// MESSAGE ROUTES
+// const router = express.Router()
+// app.use(router)
+// const Message = require('./app/models/message')
+// // CREATE
+// // POST /examples
+// router.post('/messages', (req, res, next) => {
+//   // set owner of new example to be current user
+//   // req.body.message.owner = req.user.id
+//
+//   Message.create(req.body.message)
+//     // respond to succesful `create` with status 201 and JSON of new "example"
+//     .then(message => {
+//       res.status(201).json({ message: message.toObject() })
+//       io.emit('chat message', message.toObject().text)
+//       console.log(message.toObject().text)
+//     })
+//     // if an error occurs, pass it off to our error handler
+//     // the error handler needs the error message and the `res` object so that it
+//     // can send an error message back to the client
+//     .catch(next)
+// })
+//
+// // INDEX
+// // GET /examples
+// router.get('/messages', (req, res, next) => {
+//   Message.find()
+//     .then(examples => {
+//       // `examples` will be an array of Mongoose documents
+//       // we want to convert each one to a POJO, so we use `.map` to
+//       // apply `.toObject` to each one
+//       return examples.map(example => example.toObject())
+//     })
+//     // respond with status 200 and JSON of the examples
+//     .then(messages => res.status(200).json({ messages: messages }))
+//     .then(() => {
+//       io.on('connection', function (socket) {
+//         console.log('a user connected')
+//         io.emit('chat message', 'hi')
+//       })
+//     })
+//     // if an error occurs, pass it to the handler
+//     .catch(next)
+// })
+// CLOSE MESSAGE ROUTES
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be
@@ -111,3 +158,13 @@ server.listen(port, () => {
 
 // needed for testing
 module.exports = app
+// module.exports.listen = function (app) {
+//   io = socketio.listen(app)
+//
+//   // users = io.of('/users')
+//   // users.on('connection', function(socket){
+//   //     socket.on ...
+//   // })
+//
+//   return io
+// }
