@@ -4,16 +4,8 @@ const express = require('express')
 const passport = require('passport')
 
 // pull in Mongoose model for examples
-const Message = require('../models/message')
 const Chatroom = require('../models/chatroom')
 
-// const io = require('../../server')
-// var io = require('../../server').listen(app)
-// console.log(io)
-// io.on('connection', function (socket) {
-//   console.log('TEST')
-//   io.emit('chat message', 'hi')
-// })
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
 const customErrors = require('../../lib/custom_errors')
@@ -37,76 +29,66 @@ const router = express.Router()
 
 // INDEX
 // GET /examples
-router.get('/messages', (req, res, next) => {
-  Message.find()
-    .then(examples => {
+router.get('/chatrooms', (req, res, next) => {
+  Chatroom.find()
+    .then(chatrooms => {
       // `examples` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
       // apply `.toObject` to each one
-      return examples.map(example => example.toObject())
+      return chatrooms.map(chatroom => chatroom.toObject())
     })
     // respond with status 200 and JSON of the examples
-    .then(messages => res.status(200).json({ messages: messages }))
+    .then(chatrooms => res.status(200).json({ chatrooms: chatrooms }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // SHOW
 // GET /examples/5a7db6c74d55bc51bdf39793
-// router.get('/examples/:id', requireToken, (req, res, next) => {
-//   // req.params.id will be set based on the `:id` in the route
-//   Example.findById(req.params.id)
-//     .then(handle404)
-//     // if `findById` is succesful, respond with 200 and "example" JSON
-//     .then(example => res.status(200).json({ example: example.toObject() }))
-//     // if an error occurs, pass it to the handler
-//     .catch(next)
-// })
+router.get('/examples/:id', requireToken, (req, res, next) => {
+  // req.params.id will be set based on the `:id` in the route
+  Example.findById(req.params.id)
+    .then(handle404)
+    // if `findById` is succesful, respond with 200 and "example" JSON
+    .then(example => res.status(200).json({ example: example.toObject() }))
+    // if an error occurs, pass it to the handler
+    .catch(next)
+})
 
 // CREATE
 // POST /examples
-router.post('/messages', requireToken, (req, res, next) => {
+router.post('/chatrooms', requireToken, (req, res, next) => {
   // set owner of new example to be current user
-  req.body.message.owner = req.user.id
-  const id = req.body.message.chatroomId
-  console.log(id)
+  req.body.chatroom.owner = req.user.id
 
-  Chatroom.findById(id)
-    .then(handle404)
+  Chatroom.create(req.body.chatroom)
+    // respond to succesful `create` with status 201 and JSON of new "example"
     .then(chatroom => {
-      chatroom.messages.push(req.body.message)
-      chatroom.save()
+      console.log(chatroom)
+      res.status(201).json({ chatroom: chatroom.toObject() })
     })
-    .then(() => res.sendStatus(204))
+    // if an error occurs, pass it off to our error handler
+    // the error handler needs the error message and the `res` object so that it
+    // can send an error message back to the client
     .catch(next)
-
-  // Message.create(req.body.message)
-  //   // respond to succesful `create` with status 201 and JSON of new "example"
-  //   .then(message => {
-  //     res.status(201).json({ message: message.toObject() })
-  //   })
-  //   // if an error occurs, pass it off to our error handler
-  //   // the error handler needs the error message and the `res` object so that it
-  //   // can send an error message back to the client
-  //   .catch(next)
 })
 
 // UPDATE
 // PATCH /examples/5a7db6c74d55bc51bdf39793
-router.patch('/messages/:id', requireToken, removeBlanks, (req, res, next) => {
+router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.message.owner
+  delete req.body.example.owner
 
-  Message.findById(req.params.id)
+  Example.findById(req.params.id)
     .then(handle404)
-    .then(message => {
+    .then(example => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, message)
+      requireOwnership(req, example)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return message.updateOne(req.body.message)
+      return example.updateOne(req.body.example)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
@@ -116,8 +98,8 @@ router.patch('/messages/:id', requireToken, removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /examples/5a7db6c74d55bc51bdf39793
-router.delete('/messages/:id', requireToken, (req, res, next) => {
-  Message.findById(req.params.id)
+router.delete('/examples/:id', requireToken, (req, res, next) => {
+  Example.findById(req.params.id)
     .then(handle404)
     .then(example => {
       // throw an error if current user doesn't own `example`
@@ -132,12 +114,3 @@ router.delete('/messages/:id', requireToken, (req, res, next) => {
 })
 
 module.exports = router
-// module.exports = function (io) {
-//   io.on('connection', function (socket) {
-//     socket.on('message', function (message) {
-//       // logger.log('info', message.value)
-//       socket.emit('ditConsumer', message.value)
-//       console.log('from console', message.value)
-//     })
-//   })
-// }

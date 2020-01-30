@@ -7,6 +7,7 @@ const cors = require('cors')
 const exampleRoutes = require('./app/routes/example_routes')
 const userRoutes = require('./app/routes/user_routes')
 const messageRoutes = require('./app/routes/message_routes')
+const chatroomRoutes = require('./app/routes/chatroom_routes')
 
 // require middleware
 const errorHandler = require('./lib/error_handler')
@@ -74,6 +75,7 @@ app.use(requestLogger)
 app.use(exampleRoutes)
 app.use(userRoutes)
 app.use(messageRoutes)
+app.use(chatroomRoutes)
 
 // app.get('/', function (req, res) {
 //   res.send('<h1>Hello world</h1>')
@@ -89,6 +91,11 @@ app.use(messageRoutes)
 //   })
 // })
 io.on('connection', function (socket) {
+  socket.join('test-room')
+  socket.on('test-room', function (msg) {
+    socket.emit('test-room', msg)
+  })
+
   socket.on('chat message', function (msg) {
     socket.broadcast.emit('chat message', msg)
   })

@@ -13,9 +13,15 @@ const messageSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true
+  },
+  chatroomId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Chatroom',
+    required: true
   }
 }, {
   timestamps: true
 })
 
-module.exports = mongoose.model('Message', messageSchema)
+// module.exports = mongoose.model('Message', messageSchema)
+module.exports = messageSchema
