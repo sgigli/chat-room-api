@@ -69,15 +69,18 @@ router.post('/messages', requireToken, (req, res, next) => {
   // set owner of new example to be current user
   req.body.message.owner = req.user.id
   const id = req.body.message.chatroomId
-  console.log(id)
 
   Chatroom.findById(id)
     .then(handle404)
     .then(chatroom => {
       chatroom.messages.push(req.body.message)
       chatroom.save()
+      const length = chatroom.messages.length
+      return chatroom.messages[length - 1]
     })
-    .then(() => res.sendStatus(204))
+    .then(message => {
+      res.status(201).json({ message: message })
+    })
     .catch(next)
 
   // Message.create(req.body.message)

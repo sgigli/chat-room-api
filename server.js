@@ -91,9 +91,14 @@ app.use(chatroomRoutes)
 //   })
 // })
 io.on('connection', function (socket) {
-  socket.join('test-room')
-  socket.on('test-room', function (msg) {
-    socket.emit('test-room', msg)
+  // socket.join('test-room')
+  socket.on('join-room', function (room) {
+    // socket.emit('test-room', msg)
+    socket.join(room)
+  })
+
+  socket.on('send-message', function (room) {
+    socket.broadcast.emit(room, 'new message sent')
   })
 
   socket.on('chat message', function (msg) {
@@ -105,52 +110,6 @@ io.on('connection', function (socket) {
 //   res.sendFile(__dirname + '/index.html')
 //   // res.sendFile().path.join(__dirname, '/index.html')
 // })
-
-// MESSAGE ROUTES
-// const router = express.Router()
-// app.use(router)
-// const Message = require('./app/models/message')
-// // CREATE
-// // POST /examples
-// router.post('/messages', (req, res, next) => {
-//   // set owner of new example to be current user
-//   // req.body.message.owner = req.user.id
-//
-//   Message.create(req.body.message)
-//     // respond to succesful `create` with status 201 and JSON of new "example"
-//     .then(message => {
-//       res.status(201).json({ message: message.toObject() })
-//       io.emit('chat message', message.toObject().text)
-//       console.log(message.toObject().text)
-//     })
-//     // if an error occurs, pass it off to our error handler
-//     // the error handler needs the error message and the `res` object so that it
-//     // can send an error message back to the client
-//     .catch(next)
-// })
-//
-// // INDEX
-// // GET /examples
-// router.get('/messages', (req, res, next) => {
-//   Message.find()
-//     .then(examples => {
-//       // `examples` will be an array of Mongoose documents
-//       // we want to convert each one to a POJO, so we use `.map` to
-//       // apply `.toObject` to each one
-//       return examples.map(example => example.toObject())
-//     })
-//     // respond with status 200 and JSON of the examples
-//     .then(messages => res.status(200).json({ messages: messages }))
-//     .then(() => {
-//       io.on('connection', function (socket) {
-//         console.log('a user connected')
-//         io.emit('chat message', 'hi')
-//       })
-//     })
-//     // if an error occurs, pass it to the handler
-//     .catch(next)
-// })
-// CLOSE MESSAGE ROUTES
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be
@@ -165,13 +124,3 @@ server.listen(port, () => {
 
 // needed for testing
 module.exports = app
-// module.exports.listen = function (app) {
-//   io = socketio.listen(app)
-//
-//   // users = io.of('/users')
-//   // users.on('connection', function(socket){
-//   //     socket.on ...
-//   // })
-//
-//   return io
-// }
