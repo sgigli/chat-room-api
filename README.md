@@ -7,8 +7,6 @@ integrates socket.io, a third party application, that allows the server to
 to users who are also listening on those rooms. It runs on node.js and express
 for its user interface and functionality.
 
-![App Screen Shot](/appScreenshot.png)
-
 ## Links
 * Deployed frontend: https://sgigli.github.io/chat-room-client-BT/
 * Frontend repo: https://github.com/sgigli/chat-room-client-BT
@@ -42,7 +40,7 @@ party resource.
 
 ## API Routes and Methods
 
-| METHOD | Routes                 | 
+| METHOD | Routes                 |
 |--------|------------------------|
 | POST   | `/sign-up`             |
 | POST   | `/sign-in`             |
