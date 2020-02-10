@@ -75,20 +75,20 @@ router.post('/chatrooms', requireToken, (req, res, next) => {
 
 // UPDATE
 // PATCH /examples/5a7db6c74d55bc51bdf39793
-router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
+router.patch('/chatrooms/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.example.owner
+  delete req.body.chatroom.owner
 
-  Example.findById(req.params.id)
+  Chatroom.findById(req.params.id)
     .then(handle404)
-    .then(example => {
+    .then(chatroom => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, example)
+      requireOwnership(req, chatroom)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return example.updateOne(req.body.example)
+      return chatroom.updateOne(req.body.chatroom)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
