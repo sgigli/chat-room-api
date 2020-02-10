@@ -92,18 +92,33 @@ app.use(chatroomRoutes)
 // })
 io.on('connection', function (socket) {
   // socket.join('test-room')
+  const allClients = {}
   socket.on('join-room', function (room) {
     // socket.emit('test-room', msg)
+    if (!allClients[`${room}`]) {
+      allClients[`${room}`] = [socket]
+    } else {
+      allClients[`${room}`].push(socket)
+    }
     socket.join(room)
+    console.log(allClients)
   })
 
   socket.on('send-message', function (room) {
-    socket.broadcast.emit(room, 'new message sent')
+    socket.in(room).emit('message', 'new message sent')
+    // io.sockets.in(room).emit('message', 'new message sent')
+    // socket.emit(room, 'new message sent')
+    // io.to(room).emit('some event')
   })
 
   socket.on('chat message', function (msg) {
     socket.broadcast.emit('chat message', msg)
   })
+
+  // socket.on('disconnect', function (data) {
+  //   console.log('DISCONNECT')
+  //
+  // })
 })
 
 // app.get('/', function (req, res) {

@@ -98,14 +98,14 @@ router.patch('/examples/:id', requireToken, removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /examples/5a7db6c74d55bc51bdf39793
-router.delete('/examples/:id', requireToken, (req, res, next) => {
-  Example.findById(req.params.id)
+router.delete('/chatrooms/:id', requireToken, (req, res, next) => {
+  Chatroom.findById(req.params.id)
     .then(handle404)
-    .then(example => {
+    .then(chatroom => {
       // throw an error if current user doesn't own `example`
-      requireOwnership(req, example)
+      requireOwnership(req, chatroom)
       // delete the example ONLY IF the above didn't throw
-      example.deleteOne()
+      chatroom.deleteOne()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))
