@@ -99,39 +99,88 @@ router.post('/messages', requireToken, (req, res, next) => {
 router.patch('/messages/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.message.owner
+  // delete req.body.message.owner
+  //
+  req.body.message.owner = req.user.id
+  const id = req.body.message.chatroomId
 
-  Message.findById(req.params.id)
+  Chatroom.findById(id)
     .then(handle404)
-    .then(message => {
-      // pass the `req` object and the Mongoose record to `requireOwnership`
-      // it will throw an error if the current user isn't the owner
-      requireOwnership(req, message)
-
-      // pass the result of Mongoose's `.update` to the next `.then`
-      return message.updateOne(req.body.message)
+    .then(chatroom => {
+      // console.log(chatroom.messages)
+      // const ele = chatroom.messages.find(ele => ele._id == req.params.id)
+      // console.log(ele)
+      for (let i = 0; i < chatroom.messages.length; i++) {
+        // console.log(chatroom.messages[i])
+        if (chatroom.messages[i]._id == req.params.id) {
+          chatroom.messages[i].text = req.body.message.text
+          chatroom.save()
+        }
+      }
+      // chatroom.save()
+      // const length = chatroom.messages.length
+      // return chatroom.messages[length - 1]
     })
-    // if that succeeded, return 204 and no JSON
-    .then(() => res.sendStatus(204))
-    // if an error occurs, pass it to the handler
+    .then(message => {
+      res.status(201).json({ message: message })
+    })
     .catch(next)
+  // Message.findById(req.params.id)
+  //   .then(handle404)
+  //   .then(message => {
+  //     // pass the `req` object and the Mongoose record to `requireOwnership`
+  //     // it will throw an error if the current user isn't the owner
+  //     requireOwnership(req, message)
+  //
+  //     // pass the result of Mongoose's `.update` to the next `.then`
+  //     return message.updateOne(req.body.message)
+  //   })
+  //   // if that succeeded, return 204 and no JSON
+  //   .then(() => res.sendStatus(204))
+  //   // if an error occurs, pass it to the handler
+  //   .catch(next)
 })
 
 // DESTROY
 // DELETE /examples/5a7db6c74d55bc51bdf39793
-router.delete('/messages/:id', requireToken, (req, res, next) => {
-  Message.findById(req.params.id)
+router.delete('/messages/:id/:CR', requireToken, (req, res, next) => {
+  // req.body.message.owner = req.user.id
+  // const id = req.body.message.chatroomId
+
+  Chatroom.findById(req.params.CR)
     .then(handle404)
-    .then(example => {
-      // throw an error if current user doesn't own `example`
-      requireOwnership(req, example)
-      // delete the example ONLY IF the above didn't throw
-      example.deleteOne()
+    .then(chatroom => {
+      // console.log(chatroom.messages)
+      // const ele = chatroom.messages.find(ele => ele._id == req.params.id)
+      // console.log(ele)
+      for (let i = 0; i < chatroom.messages.length; i++) {
+        // console.log(chatroom.messages[i])
+        if (chatroom.messages[i]._id == req.params.id) {
+          console.log(chatroom.messages[i])
+          chatroom.messages.splice(i, 1)
+          chatroom.save()
+        }
+      }
+      // chatroom.save()
+      // const length = chatroom.messages.length
+      // return chatroom.messages[length - 1]
     })
-    // send back 204 and no content if the deletion succeeded
-    .then(() => res.sendStatus(204))
-    // if an error occurs, pass it to the handler
+    .then(message => {
+      res.status(201).json({ message: message })
+    })
     .catch(next)
+  // Message.findById(req.params.id)
+  //   .then(handle404)
+  //   .then(example => {
+  //     // throw an error if current user doesn't own `example`
+  //     requireOwnership(req, example)
+  //     // delete the example ONLY IF the above didn't throw
+  //     example.deleteOne()
+  //   })
+  //   // send back 204 and no content if the deletion succeeded
+  //   .then(() => res.sendStatus(204))
+  //   // if an error occurs, pass it to the handler
+  //   .catch(next)
 })
 
 module.exports = router
