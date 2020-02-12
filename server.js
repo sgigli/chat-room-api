@@ -106,10 +106,22 @@ io.on('connection', function (socket) {
 
   socket.on('send-message', function (room) {
     socket.in(room).emit('message', 'new message sent')
-    // io.sockets.in(room).emit('message', 'new message sent')
-    // socket.emit(room, 'new message sent')
-    // io.to(room).emit('some event')
   })
+
+  socket.on('refresh-chatrooms', function (room) {
+    console.log('SocketTEST')
+    socket.broadcast.emit('refresh-cr', 'new message sent')
+  })
+
+  // socket.on('delete-chatroom', function (room) {
+  //   console.log('SocketTEST')
+  //   socket.broadcast.emit('refresh-chatrooms', 'new message sent')
+  // })
+  //
+  // socket.on('update-chatroom', function (room) {
+  //   console.log('SocketTEST')
+  //   socket.broadcast.emit('refresh', 'new message sent')
+  // })
 
   socket.on('chat message', function (msg) {
     socket.broadcast.emit('chat message', msg)
