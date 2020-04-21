@@ -44,7 +44,6 @@ const socketio = require('socket.io')
 const http = require('http')
 const server = http.createServer(app)
 const io = socketio(server)
-// require('./app/routes/message_routes.js')(io)
 
 // set CORS headers on response from this API using the `cors` NPM package
 // `CLIENT_ORIGIN` is an environment variable that will be set on Heroku
@@ -77,19 +76,6 @@ app.use(userRoutes)
 app.use(messageRoutes)
 app.use(chatroomRoutes)
 
-// app.get('/', function (req, res) {
-//   res.send('<h1>Hello world</h1>')
-// })
-// io.on('connection', function (socket) {
-//   console.log('a user connected')
-//   // io.emit('chat message', 'hi')
-// })
-//
-// io.on('connection', function (socket) {
-//   socket.on('chat message', function (msg) {
-//     console.log('message: ' + msg)
-//   })
-// })
 io.on('connection', function (socket) {
   // socket.join('test-room')
   const allClients = {}
@@ -113,30 +99,10 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('refresh-cr', 'new message sent')
   })
 
-  // socket.on('delete-chatroom', function (room) {
-  //   console.log('SocketTEST')
-  //   socket.broadcast.emit('refresh-chatrooms', 'new message sent')
-  // })
-  //
-  // socket.on('update-chatroom', function (room) {
-  //   console.log('SocketTEST')
-  //   socket.broadcast.emit('refresh', 'new message sent')
-  // })
-
   socket.on('chat message', function (msg) {
     socket.broadcast.emit('chat message', msg)
   })
-
-  // socket.on('disconnect', function (data) {
-  //   console.log('DISCONNECT')
-  //
-  // })
 })
-
-// app.get('/', function (req, res) {
-//   res.sendFile(__dirname + '/index.html')
-//   // res.sendFile().path.join(__dirname, '/index.html')
-// })
 
 // register error handling middleware
 // note that this comes after the route middlewares, because it needs to be

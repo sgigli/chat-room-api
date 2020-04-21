@@ -7,13 +7,6 @@ const passport = require('passport')
 const Message = require('../models/message')
 const Chatroom = require('../models/chatroom')
 
-// const io = require('../../server')
-// var io = require('../../server').listen(app)
-// console.log(io)
-// io.on('connection', function (socket) {
-//   console.log('TEST')
-//   io.emit('chat message', 'hi')
-// })
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
 const customErrors = require('../../lib/custom_errors')
@@ -51,18 +44,6 @@ router.get('/messages', (req, res, next) => {
     .catch(next)
 })
 
-// SHOW
-// GET /examples/5a7db6c74d55bc51bdf39793
-// router.get('/examples/:id', requireToken, (req, res, next) => {
-//   // req.params.id will be set based on the `:id` in the route
-//   Example.findById(req.params.id)
-//     .then(handle404)
-//     // if `findById` is succesful, respond with 200 and "example" JSON
-//     .then(example => res.status(200).json({ example: example.toObject() }))
-//     // if an error occurs, pass it to the handler
-//     .catch(next)
-// })
-
 // CREATE
 // POST /examples
 router.post('/messages', requireToken, (req, res, next) => {
@@ -82,16 +63,6 @@ router.post('/messages', requireToken, (req, res, next) => {
       res.status(201).json({ message: message })
     })
     .catch(next)
-
-  // Message.create(req.body.message)
-  //   // respond to succesful `create` with status 201 and JSON of new "example"
-  //   .then(message => {
-  //     res.status(201).json({ message: message.toObject() })
-  //   })
-  //   // if an error occurs, pass it off to our error handler
-  //   // the error handler needs the error message and the `res` object so that it
-  //   // can send an error message back to the client
-  //   .catch(next)
 })
 
 // UPDATE
@@ -107,9 +78,6 @@ router.patch('/messages/:id', requireToken, removeBlanks, (req, res, next) => {
   Chatroom.findById(id)
     .then(handle404)
     .then(chatroom => {
-      // console.log(chatroom.messages)
-      // const ele = chatroom.messages.find(ele => ele._id == req.params.id)
-      // console.log(ele)
       for (let i = 0; i < chatroom.messages.length; i++) {
         // console.log(chatroom.messages[i])
         if (chatroom.messages[i]._id == req.params.id) {
@@ -117,28 +85,11 @@ router.patch('/messages/:id', requireToken, removeBlanks, (req, res, next) => {
           chatroom.save()
         }
       }
-      // chatroom.save()
-      // const length = chatroom.messages.length
-      // return chatroom.messages[length - 1]
     })
     .then(message => {
       res.status(201).json({ message: message })
     })
     .catch(next)
-  // Message.findById(req.params.id)
-  //   .then(handle404)
-  //   .then(message => {
-  //     // pass the `req` object and the Mongoose record to `requireOwnership`
-  //     // it will throw an error if the current user isn't the owner
-  //     requireOwnership(req, message)
-  //
-  //     // pass the result of Mongoose's `.update` to the next `.then`
-  //     return message.updateOne(req.body.message)
-  //   })
-  //   // if that succeeded, return 204 and no JSON
-  //   .then(() => res.sendStatus(204))
-  //   // if an error occurs, pass it to the handler
-  //   .catch(next)
 })
 
 // DESTROY
@@ -150,11 +101,7 @@ router.delete('/messages/:id/:CR', requireToken, (req, res, next) => {
   Chatroom.findById(req.params.CR)
     .then(handle404)
     .then(chatroom => {
-      // console.log(chatroom.messages)
-      // const ele = chatroom.messages.find(ele => ele._id == req.params.id)
-      // console.log(ele)
       for (let i = 0; i < chatroom.messages.length; i++) {
-        // console.log(chatroom.messages[i])
         if (chatroom.messages[i]._id == req.params.id) {
           console.log(chatroom.messages[i])
           chatroom.messages.splice(i, 1)
@@ -169,27 +116,6 @@ router.delete('/messages/:id/:CR', requireToken, (req, res, next) => {
       res.status(201).json({ message: message })
     })
     .catch(next)
-  // Message.findById(req.params.id)
-  //   .then(handle404)
-  //   .then(example => {
-  //     // throw an error if current user doesn't own `example`
-  //     requireOwnership(req, example)
-  //     // delete the example ONLY IF the above didn't throw
-  //     example.deleteOne()
-  //   })
-  //   // send back 204 and no content if the deletion succeeded
-  //   .then(() => res.sendStatus(204))
-  //   // if an error occurs, pass it to the handler
-  //   .catch(next)
 })
 
 module.exports = router
-// module.exports = function (io) {
-//   io.on('connection', function (socket) {
-//     socket.on('message', function (message) {
-//       // logger.log('info', message.value)
-//       socket.emit('ditConsumer', message.value)
-//       console.log('from console', message.value)
-//     })
-//   })
-// }
